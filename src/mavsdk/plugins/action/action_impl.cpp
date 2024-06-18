@@ -808,32 +808,56 @@ std::pair<Action::Result, float> ActionImpl::get_takeoff_altitude() const
 }
 
 void ActionImpl::set_maximum_speed_async(
-    const float speed_m_s, const Action::ResultCallback& callback) const
+    SpeedComponent speed_component,
+    const float speed_m_s,
+    const Action::ResultCallback& callback) const
 {
-    callback(set_maximum_speed(speed_m_s));
+    static const char* names[] = {MAX_SPEED_XY_PARAM, MAX_SPEED_UP_PARAM, MAX_SPEED_DOWN_PARAM};
+    _system_impl->set_param_float_async(
+        names[(size_t)speed_component],
+        speed_m_s,
+        [=](MavlinkParameterClient::Result result) {
+            callback(
+                (result == MavlinkParameterClient::Result::Success) ?
+                    Action::Result::Success :
+                    Action::Result::ParameterError);            
+        },
+        nullptr);
 }
 
-Action::Result ActionImpl::set_maximum_speed(float speed_m_s) const
-{
-    const MavlinkParameterClient::Result result =
-        _system_impl->set_param_float(MAX_SPEED_PARAM, speed_m_s);
-    return (result == MavlinkParameterClient::Result::Success) ? Action::Result::Success :
-                                                                 Action::Result::ParameterError;
+Action::Result ActionImpl::set_maximum_speed(SpeedComponent speed_component, float speed_m_s) const
+{    
+    auto prom = std::promise<Action::Result>();
+    auto fut = prom.get_future();
+     set_maximum_speed_async(
+        speed_component, speed_m_s, [&prom](Action::Result result) { prom.set_value(result); });
+    return fut.get();
 }
 
-void ActionImpl::get_maximum_speed_async(const Action::GetMaximumSpeedCallback& callback) const
+void ActionImpl::get_maximum_speed_async(
+    SpeedComponent speed_component, const Action::GetMaximumSpeedCallback& callback) const
 {
-    auto speed_result = get_maximum_speed();
-    callback(speed_result.first, speed_result.second);
+    static const char* names[] = {MAX_SPEED_XY_PARAM, MAX_SPEED_UP_PARAM, MAX_SPEED_DOWN_PARAM};
+    _system_impl->get_param_float_async(
+        names[(size_t)speed_component],
+        [=](MavlinkParameterClient::Result result, float value) {
+            callback(
+                (result == MavlinkParameterClient::Result::Success) ?
+                    Action::Result::Success :
+                    Action::Result::ParameterError,
+                value);
+        },
+        nullptr);
 }
 
-std::pair<Action::Result, float> ActionImpl::get_maximum_speed() const
+std::pair<Action::Result, float> ActionImpl::get_maximum_speed(SpeedComponent speed_component) const
 {
-    auto result = _system_impl->get_param_float(MAX_SPEED_PARAM);
-    return std::make_pair<>(
-        (result.first == MavlinkParameterClient::Result::Success) ? Action::Result::Success :
-                                                                    Action::Result::ParameterError,
-        result.second);
+    auto prom = std::promise<std::pair<Action::Result, float>>();
+    auto fut = prom.get_future();
+     get_maximum_speed_async(speed_component, [&prom](Action::Result result, float value) {
+        prom.set_value({result, value});
+    });
+    return fut.get();
 }
 
 void ActionImpl::set_return_to_launch_altitude_async(

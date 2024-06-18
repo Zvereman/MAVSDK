@@ -28,6 +28,8 @@ public:
     std::pair<Info::Result, Info::FlightInfo> get_flight_information();
     std::pair<Info::Result, double> get_speed_factor() const;
 
+    void subscribe_flight_info(const Info::FlightInfoCallback& callback);
+
     Info::FlightInformationHandle
     subscribe_flight_information(const Info::FlightInformationCallback& callback);
     void unsubscribe_flight_information(Info::FlightInformationHandle handle);
@@ -45,6 +47,7 @@ private:
         get_flight_software_version_type(FIRMWARE_VERSION_TYPE);
 
     void wait_for_identification() const;
+    void report_flight_information_locked();
 
     mutable std::mutex _mutex{};
 
@@ -73,6 +76,8 @@ private:
     Time _time{};
     SteadyTimePoint _last_time_attitude_arrived{};
     uint32_t _last_time_boot_ms{0};
+
+    Info::FlightInfoCallback _flight_info_callback;
 
     CallbackList<Info::FlightInfo> _flight_info_subscriptions{};
 

@@ -145,6 +145,7 @@ void InfoImpl::process_flight_information(const mavlink_message_t& message)
     mavlink_flight_information_t flight_information;
     mavlink_msg_flight_information_decode(&message, &flight_information);
 
+    _flight_info.arming_time_utc = flight_information.arming_time_utc;
     _flight_info.time_boot_ms = flight_information.time_boot_ms;
     _flight_info.flight_uid = flight_information.flight_uuid;
     // The fields are called UTC but are actually since boot
@@ -304,6 +305,12 @@ std::pair<Info::Result, double> InfoImpl::get_speed_factor() const
     return std::make_pair<>(Info::Result::Success, speed_factor);
 }
 
+void InfoImpl::subscribe_flight_info(const Info::FlightInfoCallback& callback) 
+{
+    std::lock_guard<std::mutex> lock(_mutex);
+    _flight_info_callback = callback;
+}
+
 void InfoImpl::wait_for_identification() const
 {
     // Wait 0.5 seconds max
@@ -316,6 +323,13 @@ void InfoImpl::wait_for_identification() const
         }
         std::this_thread::sleep_for(std::chrono::milliseconds(10));
     }
+}
+
+void InfoImpl::report_flight_information_locked() 
+{
+    if (!_flight_info_callback) return;
+     _system_impl->call_user_callback(
+        [callback = _flight_info_callback, info = _flight_info]() { callback(info); });
 }
 
 Info::FlightInformationHandle

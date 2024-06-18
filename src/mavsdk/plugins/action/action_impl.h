@@ -105,12 +105,16 @@ public:
     Action::Result set_takeoff_altitude(float relative_altitude_m);
     std::pair<Action::Result, float> get_takeoff_altitude() const;
 
-    void
-    set_maximum_speed_async(const float speed_m_s, const Action::ResultCallback& callback) const;
-    void get_maximum_speed_async(const Action::GetMaximumSpeedCallback& callback) const;
+    using SpeedComponent = Action::SpeedComponent;
+    void set_maximum_speed_async(
+        SpeedComponent speed_component,
+        const float speed_m_s,
+        const Action::ResultCallback& callback) const;
+    void get_maximum_speed_async(
+        SpeedComponent speed_component, const Action::GetMaximumSpeedCallback& callback) const;
 
-    Action::Result set_maximum_speed(float speed_m_s) const;
-    std::pair<Action::Result, float> get_maximum_speed() const;
+    Action::Result set_maximum_speed(SpeedComponent speed_component, float speed_m_s) const;
+    std::pair<Action::Result, float> get_maximum_speed(SpeedComponent speed_component) const;
 
     void set_return_to_launch_altitude_async(
         const float relative_altitude_m, const Action::ResultCallback& callback) const;
@@ -149,6 +153,9 @@ private:
     static constexpr uint8_t VEHICLE_MODE_FLAG_CUSTOM_MODE_ENABLED = 1;
     static constexpr auto TAKEOFF_ALT_PARAM = "MIS_TAKEOFF_ALT";
     static constexpr auto MAX_SPEED_PARAM = "MPC_XY_CRUISE";
+    static constexpr auto MAX_SPEED_XY_PARAM = "MPC_XY_CRUISE";
+    static constexpr auto MAX_SPEED_UP_PARAM = "MPC_Z_VEL_MAX_UP";
+    static constexpr auto MAX_SPEED_DOWN_PARAM = "MPC_Z_VEL_MAX_DN";
     static constexpr auto RTL_RETURN_ALTITUDE_PARAM = "RTL_RETURN_ALT";
 };
 

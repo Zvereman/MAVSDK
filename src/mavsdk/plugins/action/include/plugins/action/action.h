@@ -566,12 +566,18 @@ public:
      */
     using GetMaximumSpeedCallback = std::function<void(Result, float)>;
 
+    /** 
+     * @brief Callback type for get_maximum_speed_async.
+    */
+    enum class SpeedComponent { XY, Up, Down };
+
     /**
      * @brief Get the vehicle maximum speed (in metres/second).
      *
      * This function is non-blocking. See 'get_maximum_speed' for the blocking counterpart.
      */
-    void get_maximum_speed_async(const GetMaximumSpeedCallback callback);
+    void
+    get_maximum_speed_async(SpeedComponent speed_component, const GetMaximumSpeedCallback callback);
 
     /**
      * @brief Get the vehicle maximum speed (in metres/second).
@@ -580,14 +586,15 @@ public:
      *
      * @return Result of request.
      */
-    std::pair<Result, float> get_maximum_speed() const;
+    std::pair<Result, float> get_maximum_speed(SpeedComponent speed_component) const;
 
     /**
      * @brief Set vehicle maximum speed (in metres/second).
      *
      * This function is non-blocking. See 'set_maximum_speed' for the blocking counterpart.
      */
-    void set_maximum_speed_async(float speed, const ResultCallback callback);
+    void set_maximum_speed_async(
+        SpeedComponent speed_component, float speed, const ResultCallback callback);
 
     /**
      * @brief Set vehicle maximum speed (in metres/second).
@@ -596,7 +603,7 @@ public:
      *
      * @return Result of request.
      */
-    Result set_maximum_speed(float speed) const;
+    Result set_maximum_speed(SpeedComponent speed_component, float speed) const;
 
     /**
      * @brief Callback type for get_return_to_launch_altitude_async.

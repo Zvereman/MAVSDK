@@ -6,6 +6,7 @@
 
 #include "info_impl.h"
 #include "plugins/info/info.h"
+// #include "info.h"
 
 namespace mavsdk {
 
@@ -46,6 +47,7 @@ std::pair<Info::Result, double> Info::get_speed_factor() const
     return _impl->get_speed_factor();
 }
 
+void Info::subscribe_flight_info(const FlightInfoCallback& callback) {}
 Info::FlightInformationHandle
 Info::subscribe_flight_information(const FlightInformationCallback& callback)
 {
