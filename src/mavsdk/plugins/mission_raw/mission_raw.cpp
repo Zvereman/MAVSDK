@@ -58,6 +58,16 @@ MissionRaw::Result MissionRaw::upload_rally_points(std::vector<MissionItem> miss
     return _impl->upload_rally_points(mission_items);
 }
 
+void MissionRaw::download_rally_points_async(const DownloadRallyPointsCallback callback)
+{
+    _impl->download_rally_points_async(callback);
+}
+
+std::pair<MissionRaw::Result, std::vector<MissionRaw::MissionItem> > MissionRaw::download_rally_points() const
+{
+    return _impl->download_rally_points();
+}
+
 MissionRaw::Result MissionRaw::cancel_mission_upload() const
 {
     return _impl->cancel_mission_upload();

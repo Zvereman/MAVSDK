@@ -24,6 +24,8 @@ public:
 
     std::pair<MissionRaw::Result, std::vector<MissionRaw::MissionItem>> download_mission();
     void download_mission_async(const MissionRaw::DownloadMissionCallback& callback);
+    std::pair<MissionRaw::Result, std::vector<MissionRaw::MissionItem>> download_rally_points();
+    void download_rally_points_async(const MissionRaw::DownloadMissionCallback& callback);
     MissionRaw::Result cancel_mission_download();
 
     MissionRaw::Result upload_mission(std::vector<MissionRaw::MissionItem> mission_items);

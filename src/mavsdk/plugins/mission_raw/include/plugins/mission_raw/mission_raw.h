@@ -240,6 +240,27 @@ public:
     Result upload_rally_points(std::vector<MissionItem> mission_items) const;
 
     /**
+     * @brief Callback type for download_rally_points_async.
+     */
+    using DownloadRallyPointsCallback = std::function<void(Result, std::vector<MissionItem>)>;
+
+    /**
+     * @brief Download a list of raw rally points items from the system (asynchronous).
+     *
+     * This function is non-blocking. See 'download_rally_points' for the blocking counterpart.
+     */
+    void download_rally_points_async(const DownloadRallyPointsCallback callback);
+
+    /**
+     * @brief Download a list of raw rally points items from the system (asynchronous).
+     *
+     * This function is blocking. See 'download_rally_points_async' for the non-blocking counterpart.
+     *
+     * @return Result of request.
+     */
+    std::pair<Result, std::vector<MissionRaw::MissionItem>> download_rally_points() const;
+
+    /**
      * @brief Cancel an ongoing mission upload.
      *
      * This function is blocking.
